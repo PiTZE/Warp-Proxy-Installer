@@ -17,7 +17,7 @@ VERSION="1.3.1"
 #   WireProxy is a secure and fast proxy service that routes your network traffic through Cloudflare's global network.
 #
 # Changelog:
-#   v1.3.1 (2025-08-07): Fixed breaking changes in fscarmen-warp v3.x - Corrected menu flow: port input comes before account type selection
+#   v1.3.1 (2025-08-07): Fixed compatibility with fscarmen-warp v3.x
 #   v1.3.0 (2025-08-07): Initial release with improved error handling and user experience
 #
 # Previous Author: [hamid-gh98](https://github.com/hamid-gh98)
@@ -506,12 +506,17 @@ function step_check_status() {
 
 function step_install_warp() {
   {
-    # Updated input sequence for fscarmen v3.x
-    # Provide multiple inputs to handle various prompts:
-    # 1: Choose install wireproxy
-    # ${WP_INSTALL_PORT}: Port number
-    # (empty): Accept defaults for any additional prompts
-    echo -e "1\n${WP_INSTALL_PORT}\n\n\n" | timeout 300 warp w
+    # Set a more aggressive timeout and add error handling
+    echo -e "1\n${WP_INSTALL_PORT}\n\n\n" | timeout 120 warp w
+    local exit_code=$?
+    # Check if timeout occurred (exit code 124) or other failure
+    if [[ $exit_code -eq 124 ]]; then
+      echo "Installation timed out after 120 seconds" >&2
+      return 1
+    elif [[ $exit_code -ne 0 ]]; then
+      echo "Installation failed with exit code: $exit_code" >&2
+      return 1
+    fi
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
@@ -525,15 +530,26 @@ function step_start_warp() {
 
 function step_reinstall_warp() {
   {
-    warp u <<< $'y\n'
+    # Uninstall existing warp with timeout
+    timeout 60 warp u <<< $'y\n'
+    local uninstall_code=$?
+    if [[ $uninstall_code -eq 124 ]]; then
+      echo "Uninstall timed out after 60 seconds" >&2
+    fi
+    
+    # Recreate command
     run_step "step_create_command"
-    # Updated input sequence for fscarmen v3.x
-    # Provide multiple inputs to handle various prompts:
-    # 1: Choose install wireproxy
-    # ${WP_INSTALL_PORT}: Port number
-    # y: Confirm reinstallation
-    # (empty): Accept defaults for any additional prompts
-    echo -e "1\n${WP_INSTALL_PORT}\ny\n\n\n" | timeout 300 warp w
+    
+    # Reinstall with timeout and error handling
+    echo -e "1\n${WP_INSTALL_PORT}\ny\n\n\n" | timeout 120 warp w
+    local install_code=$?
+    if [[ $install_code -eq 124 ]]; then
+      echo "Reinstallation timed out after 120 seconds" >&2
+      return 1
+    elif [[ $install_code -ne 0 ]]; then
+      echo "Reinstallation failed with exit code: $install_code" >&2
+      return 1
+    fi
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
