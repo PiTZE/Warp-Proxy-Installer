@@ -2,20 +2,24 @@
 
 
 AUTHOR="[PiTZE](https://github.com/PiTZE)"
-VERSION="1.3.0"
+VERSION="1.3.1"
 
 
 #
-# Version: 1.3.0
+# Version: 1.3.1
 # Date Created: 2023-04-18
 # Date Modified: 2025-08-07
-# 
+#
 # Script: install_warp_proxy.sh
-# 
+#
 # Description:
 #   This script installs Warp Socks5 Proxy (WireProxy) for your system.
 #   WireProxy is a secure and fast proxy service that routes your network traffic through Cloudflare's global network.
-# 
+#
+# Changelog:
+#   v1.3.1 (2025-08-07): Fixed breaking changes in fscarmen-warp v3.x - Updated input sequences for new account type menu
+#   v1.3.0 (2025-08-07): Initial release with improved error handling and user experience
+#
 # Previous Author: [hamid-gh98](https://github.com/hamid-gh98)
 # Author:          [PiTZE](https://github.com/PiTZE)
 # 
@@ -501,23 +505,14 @@ function step_check_status() {
 
 
 function step_install_warp() {
-  echo "DEBUG: Starting warp installation..."
-  echo "DEBUG: Using port: ${WP_INSTALL_PORT}"
-  
-  # Add timeout to prevent hanging
-  timeout 30 bash -c "warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\n'"
-  local exit_code=$?
-  
-  echo "DEBUG: Warp command exited with code: $exit_code"
-  
-  if [[ $exit_code -ne 0 ]]; then
-    if [[ $exit_code -eq 124 ]]; then
-      echo "ERROR: Command timed out after 30 seconds"
-    fi
-    STEP_STATUS=0
-  else
-    STEP_STATUS=1
-  fi
+  {
+    # Updated input sequence for fscarmen v3.x
+    # 1 = Continue (from the initial menu)
+    # 3 = Use free account (from the account type menu)
+    # ${WP_INSTALL_PORT} = Port number
+    warp w <<< $'1\n3\n'"${WP_INSTALL_PORT}"$'\n'
+  }
+  [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
 
 
@@ -531,8 +526,12 @@ function step_reinstall_warp() {
   {
     warp u <<< $'y\n'
     run_step "step_create_command"
-    # Updated input sequence for v3.x
-    warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
+    # Updated input sequence for fscarmen v3.x
+    # 1 = Continue (from the initial menu)
+    # 3 = Use free account (from the account type menu)
+    # ${WP_INSTALL_PORT} = Port number
+    # y = Confirm reinstallation
+    warp w <<< $'1\n3\n'"${WP_INSTALL_PORT}"$'\ny\n'
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
