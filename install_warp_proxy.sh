@@ -17,7 +17,7 @@ VERSION="1.3.1"
 #   WireProxy is a secure and fast proxy service that routes your network traffic through Cloudflare's global network.
 #
 # Changelog:
-#   v1.3.1 (2025-08-07): Fixed breaking changes in fscarmen-warp v3.x - Updated input sequences for new account type menu
+#   v1.3.1 (2025-08-07): Fixed breaking changes in fscarmen-warp v3.x - Corrected menu flow: port input comes before account type selection
 #   v1.3.0 (2025-08-07): Initial release with improved error handling and user experience
 #
 # Previous Author: [hamid-gh98](https://github.com/hamid-gh98)
@@ -65,6 +65,7 @@ plain="\e[0m"
 # Draw ASCII-ART
 function draw_ascii_art() {
   echo -e "
+
 ░▒▓███████▓▒░  ░▒▓█▓▒░       ░▒▓████████▓▒░ ░▒▓████████▓▒░ ░▒▓████████▓▒░ 
 ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░          ░▒▓█▓▒░            ░▒▓█▓▒░ ░▒▓█▓▒░        
 ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░          ░▒▓█▓▒░          ░▒▓██▓▒░  ░▒▓█▓▒░        
@@ -72,8 +73,7 @@ function draw_ascii_art() {
 ░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░      ░▒▓██▓▒░      ░▒▓█▓▒░        
 ░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░     ░▒▓█▓▒░        ░▒▓█▓▒░        
 ░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░     ░▒▓████████▓▒░ ░▒▓████████▓▒░ 
-                                                                          
-                                                                                                                        
+                                                                                                                                                                                                
 "
 }
 
@@ -508,9 +508,9 @@ function step_install_warp() {
   {
     # Updated input sequence for fscarmen v3.x
     # 1 = Continue (from the initial menu)
-    # 3 = Use free account (from the account type menu)
     # ${WP_INSTALL_PORT} = Port number
-    warp w <<< $'1\n3\n'"${WP_INSTALL_PORT}"$'\n'
+    # 1 = Use free account (default option in the account type menu)
+    warp w <<< $'1\n'"${WP_INSTALL_PORT}"$'\n1\n'
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
@@ -528,10 +528,10 @@ function step_reinstall_warp() {
     run_step "step_create_command"
     # Updated input sequence for fscarmen v3.x
     # 1 = Continue (from the initial menu)
-    # 3 = Use free account (from the account type menu)
     # ${WP_INSTALL_PORT} = Port number
+    # 1 = Use free account (default option in the account type menu)
     # y = Confirm reinstallation
-    warp w <<< $'1\n3\n'"${WP_INSTALL_PORT}"$'\ny\n'
+    warp w <<< $'1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
