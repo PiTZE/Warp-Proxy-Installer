@@ -61,16 +61,16 @@ plain="\e[0m"
 # Draw ASCII-ART
 function draw_ascii_art() {
   echo -e "
-_______   __  ________  ________  ________ 
-|       \ |  \|        \|        \|        \
-| $$$$$$$\ \$$ \$$$$$$$$ \$$$$$$$$| $$$$$$$$
-| $$__/ $$|  \   | $$       /  $$ | $$__    
-| $$    $$| $$   | $$      /  $$  | $$  \   
-| $$$$$$$ | $$   | $$     /  $$   | $$$$$   
-| $$      | $$   | $$    /  $$___ | $$_____ 
-| $$      | $$   | $$   |  $$    \| $$     \
- \$$       \$$    \$$    \$$$$$$$$ \$$$$$$$$
-  "
+░▒▓███████▓▒░  ░▒▓█▓▒░       ░▒▓████████▓▒░ ░▒▓████████▓▒░ ░▒▓████████▓▒░ 
+░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░          ░▒▓█▓▒░            ░▒▓█▓▒░ ░▒▓█▓▒░        
+░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░          ░▒▓█▓▒░          ░▒▓██▓▒░  ░▒▓█▓▒░        
+░▒▓███████▓▒░  ░▒▓█▓▒░          ░▒▓█▓▒░        ░▒▓██▓▒░    ░▒▓██████▓▒░   
+░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░      ░▒▓██▓▒░      ░▒▓█▓▒░        
+░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░     ░▒▓█▓▒░        ░▒▓█▓▒░        
+░▒▓█▓▒░        ░▒▓█▓▒░          ░▒▓█▓▒░     ░▒▓████████▓▒░ ░▒▓████████▓▒░ 
+                                                                          
+                                                                                                                        
+"
 }
 
 
@@ -501,9 +501,23 @@ function step_check_status() {
 
 
 function step_install_warp() {
-  # Updated input sequence for v3.x
-  warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
-  [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
+  echo "DEBUG: Starting warp installation..."
+  echo "DEBUG: Using port: ${WP_INSTALL_PORT}"
+  
+  # Add timeout to prevent hanging
+  timeout 30 bash -c "warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\n'"
+  local exit_code=$?
+  
+  echo "DEBUG: Warp command exited with code: $exit_code"
+  
+  if [[ $exit_code -ne 0 ]]; then
+    if [[ $exit_code -eq 124 ]]; then
+      echo "ERROR: Command timed out after 30 seconds"
+    fi
+    STEP_STATUS=0
+  else
+    STEP_STATUS=1
+  fi
 }
 
 
