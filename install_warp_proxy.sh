@@ -507,10 +507,11 @@ function step_check_status() {
 function step_install_warp() {
   {
     # Updated input sequence for fscarmen v3.x
-    # 1 = Continue (from the initial menu)
-    # ${WP_INSTALL_PORT} = Port number
-    # 1 = Use free account (default option in the account type menu)
-    warp w <<< $'1\n'"${WP_INSTALL_PORT}"$'\n1\n'
+    # Provide multiple inputs to handle various prompts:
+    # 1: Choose install wireproxy
+    # ${WP_INSTALL_PORT}: Port number
+    # (empty): Accept defaults for any additional prompts
+    echo -e "1\n${WP_INSTALL_PORT}\n\n\n" | timeout 300 warp w
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
@@ -527,11 +528,12 @@ function step_reinstall_warp() {
     warp u <<< $'y\n'
     run_step "step_create_command"
     # Updated input sequence for fscarmen v3.x
-    # 1 = Continue (from the initial menu)
-    # ${WP_INSTALL_PORT} = Port number
-    # 1 = Use free account (default option in the account type menu)
-    # y = Confirm reinstallation
-    warp w <<< $'1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
+    # Provide multiple inputs to handle various prompts:
+    # 1: Choose install wireproxy
+    # ${WP_INSTALL_PORT}: Port number
+    # y: Confirm reinstallation
+    # (empty): Accept defaults for any additional prompts
+    echo -e "1\n${WP_INSTALL_PORT}\ny\n\n\n" | timeout 300 warp w
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
