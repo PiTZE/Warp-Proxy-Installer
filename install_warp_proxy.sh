@@ -1,14 +1,14 @@
 #!/bin/bash
 
 
-AUTHOR="[hamid-gh98](https://github.com/hamid-gh98)"
-VERSION="1.2.0"
+AUTHOR="[PiTZE](https://github.com/PiTZE)"
+VERSION="1.3.0"
 
 
 #
-# Version: 1.2.0
+# Version: 1.3.0
 # Date Created: 2023-04-18
-# Date Modified: 2023-05-30
+# Date Modified: 2025-08-07
 # 
 # Script: install_warp_proxy.sh
 # 
@@ -16,7 +16,8 @@ VERSION="1.2.0"
 #   This script installs Warp Socks5 Proxy (WireProxy) for your system.
 #   WireProxy is a secure and fast proxy service that routes your network traffic through Cloudflare's global network.
 # 
-# Author: [hamid-gh98](https://github.com/hamid-gh98)
+# Previous Author: [hamid-gh98](https://github.com/hamid-gh98)
+# Author:          [PiTZE](https://github.com/PiTZE)
 # 
 # Usage: bash ./install-warp-proxy.sh [-y] [-f]
 # 
@@ -42,9 +43,9 @@ VERSION="1.2.0"
 #   8. Rocky
 # 
 # One-Line Command for installation: (use of this commands)
-#   not-forced: `curl -fsSL https://raw.githubusercontent.com/hamid-gh98/x-ui-scripts/main/install_warp_proxy.sh | bash`
-#   not-forced: `bash <(curl -sSL https://raw.githubusercontent.com/hamid-gh98/x-ui-scripts/main/install_warp_proxy.sh)`
-#   forced: `bash <(curl -sSL https://raw.githubusercontent.com/hamid-gh98/x-ui-scripts/main/install_warp_proxy.sh) -yf`
+#   not-forced: `curl -fsSL https://raw.githubusercontent.com/PiTZE/Warp-Proxy-Installer/main/install_warp_proxy.sh | bash`
+#   not-forced: `bash <(curl -sSL https://raw.githubusercontent.com/PiTZE/Warp-Proxy-Installer/main/install_warp_proxy.sh)`
+#   forced: `bash <(curl -sSL https://raw.githubusercontent.com/PiTZE/Warp-Proxy-Installer/main/install_warp_proxy.sh) -yf`
 # 
 
 
@@ -60,12 +61,15 @@ plain="\e[0m"
 # Draw ASCII-ART
 function draw_ascii_art() {
   echo -e "
-   ____  ____       _       ____    ____  _____  ______              ______  ____  ____    
-  |_   ||   _|     / \     |_   \  /   _||_   _||_   _ \`.          .' ___  ||_   ||   _|  
-    | |__| |      / _ \      |   \/   |    | |    | | \`. \ ______ / .'   \_|  | |__| |    
-    |  __  |     / ___ \     | |\  /| |    | |    | |  | ||______|| |   ____  |  __  |     
-   _| |  | |_  _/ /   \ \_  _| |_\/_| |_  _| |_  _| |_.' /        \ \`.___]  |_| |  | |_   
-  |____||____||____| |____||_____||_____||_____||______.'          \`._____.'|____||____|  
+_______   __  ________  ________  ________ 
+|       \ |  \|        \|        \|        \
+| $$$$$$$\ \$$ \$$$$$$$$ \$$$$$$$$| $$$$$$$$
+| $$__/ $$|  \   | $$       /  $$ | $$__    
+| $$    $$| $$   | $$      /  $$  | $$  \   
+| $$$$$$$ | $$   | $$     /  $$   | $$$$$   
+| $$      | $$   | $$    /  $$___ | $$_____ 
+| $$      | $$   | $$   |  $$    \| $$     \
+ \$$       \$$    \$$    \$$$$$$$$ \$$$$$$$$
   "
 }
 
@@ -497,7 +501,8 @@ function step_check_status() {
 
 
 function step_install_warp() {
-  warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\n'
+  # Updated input sequence for v3.x
+  warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
 
@@ -512,7 +517,8 @@ function step_reinstall_warp() {
   {
     warp u <<< $'y\n'
     run_step "step_create_command"
-    warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\n'
+    # Updated input sequence for v3.x
+    warp w <<< $'1\n1\n'"${WP_INSTALL_PORT}"$'\n1\ny\n'
   }
   [[ $? -ne 0 ]] && STEP_STATUS=0 || STEP_STATUS=1
 }
